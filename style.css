@@ -1,0 +1,50 @@
+#header {
+	font-family: 'Playfair Display';
+	margin-bottom: 7px;
+	}
+	#header h1 {
+		margin: 0;
+	}
+#content {
+	position: absolute;
+	width: 900px;
+	left: 50%;
+	margin-left: -450px;
+	float: left;
+	padding-bottom: 50px;
+}
+#articles .column {
+	float: left;
+	margin: 0;
+	width: 300px;
+	box-sizing: border-box;
+	padding: 5px;
+	font-family: 'Playfair Display';
+	}
+	#articles .article {
+		padding-bottom: 16px;
+		position: relative;
+	}
+	.article :after {
+		content: "";
+		display: block;
+		position: absolute;
+		top: 100%;
+		width: 100px;
+		left: 50%;
+		margin-left: -50px;
+		border: 1px solid black;
+		margin-top: -8px;
+	}
+	.article:last-child :after {
+		display: none;		
+	}
+	.article h3 {
+		margin: 0;
+		padding: 0;
+		margin-bottom: 0px;
+	}
+	.article p {
+		text-align: justify;
+		margin: 0;
+	}
