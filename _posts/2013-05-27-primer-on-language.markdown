@@ -2,8 +2,8 @@
 layout: post
 title:  "A Primer on the Structure and Interpretation of Programs"
 date:   2013-04-18 21:01:00
-categories: deriving rubiks
-excerpt: "The Rubik's Cube is the quintessential group, that is, it perfectly exhibits the complications of exclusively non-commutative operations on an algebraic space. Hence solving a Rubik's cube, i.e., inverting a given permutation of a cube, is very non-trivial; however, with the right motivations, one can find algorithms that will manipulate the cube in useful ways, allowing one to gradually approach a solved cube."
+categories: programming rudiments
+excerpt: "\"The evolution of a process is directed by a pattern of rules called a program.\"1 <br> \"A function is a rule of correspondence ... that is, a function is an operation that may be applied to one thing ... to yield another thing.\"2 <br> The above serve as outlooks on the concepts surrounding computation approximately corresponding to the two original theories of computation, that of Turing and that of Church."
 ---
 
 Computational Processes
