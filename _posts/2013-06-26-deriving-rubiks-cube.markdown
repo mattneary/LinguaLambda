@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "A Derivation of Macros in a Non-Commutative Space"
-date:   2013-06-18 11:50:00
+date:   2013-06-18 04:27:00
 categories: deriving rubiks
 excerpt: "The Rubik's Cube is the quintessential group, that is, it perfectly exhibits the complications of exclusively non-commutative operations on an algebraic space. Hence solving a Rubik's cube, i.e., inverting a given permutation of a cube, is very non-trivial; however, with the right motivations, one can find algorithms that will manipulate the cube in useful ways, allowing one to gradually approach a solved cube."
 ---

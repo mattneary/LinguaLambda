@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "A Primer on the Structure and Interpretation of Programs"
-date:   2013-04-18 21:01:00
+date:   2013-05-27 21:01:00
 categories: programming rudiments
 excerpt: "\"The evolution of a process is directed by a pattern of rules called a program.\"1 <br> \"A function is a rule of correspondence ... that is, a function is an operation that may be applied to one thing ... to yield another thing.\"2 <br> The above serve as outlooks on the concepts surrounding computation approximately corresponding to the two original theories of computation, that of Turing and that of Church."
 ---
