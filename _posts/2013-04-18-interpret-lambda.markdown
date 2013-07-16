@@ -6,11 +6,17 @@ categories: lambda interpreter
 excerpt: "The idea of computational equivalency was first suggested by Alan Turing; it has since played a fundamental role in our understanding of computation. Turing proposed the idea of universal computation machines, now known by the name of Universal Turing Machines, saying that some mechanical devices are capable of simulating all others. A profound concept which we will take advantage of in our interpretation of one language within another."
 ---
 
-Implementing an interpreter can seem a very daunting task for beginners. For a long time I felt there was a part of the process I failed to understand. However, having finally jumped in, the process seems rather straight-forward, parse then evaluate.
+The idea of computational equivalency was first suggested by Alan Turing; it has since played a fundamental role in our understanding of computation. Turing proposed the idea of universal computation machines, now known by the name of Universal Turing Machines, saying that some mechanical devices are capable of simulating all others. A profound concept which we will take advantage of in our interpretation of one language within another, namely, the interpretation of the Lambda Calculus in JavaScript.
+
+Why?
+----
+You may feel no motivation to write an interpreter, thinking there is no direct application of what it may teach you. I strongly encourage you to give it a try; it's not as hard as one might think, and exhibits an extremely valuable skill. I think [Lindsey Kuper](http://composition.al/blog/2013/06/23/write-an-interpreter/) puts it best:
+
+	To me, one reason is that an interpreter is the quintessential program that operates on programs. To be comfortable with interpreters is to be comfortable with the idea of code as data, a powerful and ubiquitous idea. Programs that operate on programs include things like interpreters and compilers, but also things like emulators and debuggers. Much of the programming world regards these kinds of programs as magical, but they aren’t.
 
 Parsing
 -------
-Let's take an example language, Lambda Calculus. Lambda Calculus has very simple notation which we can summarize as follows:
+Lambda Calculus has very simple notation which we can summarize as follows:
 
 	<exp> ::= <var>
 			| <exp> <exp>
@@ -197,8 +203,6 @@ Putting it all together, we expose a program interpreter as a function of filena
 	};
 {% endhighlight %}
 
-Hopefully the implementation of this language's interpreter has made clear the process of interpretation, especially its recursive nature. You can see the full project on [Github][interpreter]. If you are interested in writing full-fledged programs in lambda calculus, read either my article [attempting to make some friendly constructs][enhancing] in pure lambda calculus, or another in which I [bootstrap lambda calculus][bootstrap].
+Hopefully the implementation of this language's interpreter has made clear the process of interpretation, especially its recursive nature. You can see the full project on [Github][interpreter].
 
 [interpreter]: https://github.com/mattneary/Lambda-Calculus-Interpreter
-[enhancing]: http://mattneary.com/#!/from_within.md
-[bootstrap]: http://mattneary.com/#!/bootstrap.md

@@ -43,3 +43,5 @@ a, &amp; \text{if }B = \emptyset, \\
 \\		&amp;\vdash t_{1} + t_{2} \in \mathbb{4}	\tag{by $\textit{d}$}
 \end{align*}
 </div>
+
+Our conclusion is reached by means of set formation to mirror the addition, and then subtraction to a set of known cardinality, namely $\{ \emptyset \}$. Once the singleton is reached, we build up by unions to the set of interest, namely $(t_{1} + t_{2})$, incrementing the cardinality set as we go. Hence we arrive at our answer.
