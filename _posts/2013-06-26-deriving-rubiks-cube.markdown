@@ -19,11 +19,11 @@ A 2x2 Rubik's cube consists of 6 faces, each with two layers of 2 cubes each. To
 
 <div>
 \begin{align*}
-	\text{&lt;face&gt;} &::= \ F\ |\ U\ |\ D\ |\ L\ |\ R\ |\ B
-\\	\text{&lt;edge&gt;} &::= \ U\ |\ D
-\\	\text{&lt;corner&gt;} &::= \ L\ |\ R
+	\text{&lt; face&gt; } &amp; ::= \ F\ |\ U\ |\ D\ |\ L\ |\ R\ |\ B
+\\	\text{&lt; edge&gt; } &amp; ::= \ U\ |\ D
+\\	\text{&lt; corner&gt; } &amp; ::= \ L\ |\ R
 \\
-\\	\text{&lt;facelet&gt;} &::= \ \text{&lt;face&gt;} \text{&lt;edge&gt;} \text{&lt;corner&gt;}
+\\	\text{&lt; facelet&gt; } &amp; ::= \ \text{&lt; face&gt; } \text{&lt; edge&gt; } \text{&lt; corner&gt; }
 \end{align*}
 </div>
 
@@ -34,12 +34,12 @@ Beyond identifying the state of a cube, we will further want a means of communic
 
 <div>
 \begin{align*}
-	U &:= (\text{LUL FUL RUL BUL})(\text{LUR FUR RUR BUR})(\text{UUL UUR UDR UDL})
-\\	D &:= (\text{LDL FDL RDL BDL})(\text{LDR FDR RDR BDR})(\text{DUL DUR DDR DDL})
-\\	L &:= (\text{UUL FUL DUL BDR})(\text{UDL FDL DDL BUR})(\text{LUL LUR LDR LDL})
-\\	R &:= (\text{UUR FUR DUR BDL})(\text{UDR FDR DDR BUL})(\text{RUL RUR RDR RDL})
-\\	F &:= (\text{UDL RDL DUL LUR})(\text{UDR RUL DUR LDR})(\text{FUL FUR FDR FDL})
-\\	B &:= (\text{UUL RUR DDL LDL})(\text{UUR RDR DDR LUR})(\text{BUL BUR BDR BDL})
+	U &amp; := (\text{LUL FUL RUL BUL})(\text{LUR FUR RUR BUR})(\text{UUL UUR UDR UDL})
+\\	D &amp; := (\text{LDL FDL RDL BDL})(\text{LDR FDR RDR BDR})(\text{DUL DUR DDR DDL})
+\\	L &amp; := (\text{UUL FUL DUL BDR})(\text{UDL FDL DDL BUR})(\text{LUL LUR LDR LDL})
+\\	R &amp; := (\text{UUR FUR DUR BDL})(\text{UDR FDR DDR BUL})(\text{RUL RUR RDR RDL})
+\\	F &amp; := (\text{UDL RDL DUL LUR})(\text{UDR RUL DUR LDR})(\text{FUL FUR FDR FDL})
+\\	B &amp; := (\text{UUL RUR DDL LDL})(\text{UUR RDR DDR LUR})(\text{BUL BUR BDR BDL})
 \end{align*}
 </div>
 
@@ -68,8 +68,8 @@ Obviously face-turns of a Rubik's cube are not commutative; if they were, any cu
 
 <div>
 \begin{align*}
-	&lt;\text{faceturn}&gt; &::= U\ |\ D\ |\ L\ |\ R\ |\ F\ |\ B
-\\	&lt;\text{permutation}&gt; &::= &lt;\text{faceturn}&gt; | &lt;\text{permutation}&gt;&lt;\text{faceturn}&gt;
+	&lt; \text{faceturn}&gt;  &amp; ::= U\ |\ D\ |\ L\ |\ R\ |\ F\ |\ B
+\\	&lt; \text{permutation}&gt;  &amp; ::= &lt; \text{faceturn}&gt;  | &lt; \text{permutation}&gt; &lt; \text{faceturn}&gt; 
 \end{align*}
 </div>
 
@@ -89,8 +89,8 @@ In our definition of $\mathcal{R}$, we defined a permutation as a composition of
 
 <div>
 \begin{align*}
-	&lt;\text{faceturn}&gt; &::= F^2R^2
-\\	&lt;\text{permutation}&gt; &::= &lt;\text{faceturn}&gt; | &lt;\text{permutation}&gt;&lt;\text{faceturn}&gt;
+	&lt; \text{faceturn}&gt;  &amp; ::= F^2R^2
+\\	&lt; \text{permutation}&gt;  &amp;::= &lt; \text{faceturn}&gt;  | &lt; \text{permutation}&gt; &lt; \text{faceturn}&gt; 
 \end{align*}
 </div>
 
