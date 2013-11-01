@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>A Primer on the Structure and Interpretation of Programs</title>
+        <meta name="viewport" content="width=device-width">
+
+        <!-- syntax highlighting CSS -->
+        <link rel="stylesheet" href="/css/syntax.css">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+    </head>
+    <body>
+
+        <div class="container">
+          <div class="site">
+            <div class="header">
+              <h1 class="title"><a href="/">Lingua Lambda</a></h1>
+<!--              <a class="extra" href="/">home</a><br>          -->
+              <em>traversing the tongues of computation</em>
+            </div>
+
+                <h2>A Primer on the Structure and Interpretation of Programs</h2>
+<p class="meta">27 May 2013</p>
+
+<div class="post">
+<h2 id='computational_processes'>Computational Processes</h2>
+
+<p>What&#8217;s a program? A program manipulates all input, if any, to bear output. This may be embodied in a robot&#8217;s response to ultraviolet sensors or an app&#8217;s posting of a tweet. Our first program will have two potential outputs, &#8220;It&#8217;s Friday!&#8221; and &#8220;It&#8217;s not Friday!&#8221; based on input of a number, 1-7.</p>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>whatDay = </span><span class='nf'>(day) -&gt;</span> <span class='k'>switch</span> <span class='nx'>day</span>
+	<span class='k'>when</span> <span class='mi'>5</span> <span class='k'>then</span> <span class='s'>&quot;It&#39;s Friday!&quot;</span>
+	<span class='k'>else</span> <span class='s'>&quot;It&#39;s not Friday!&quot;</span>
+</code></pre></div>
+<p>What has been created above is an example of <em>code</em>. Code is a collection of text following the syntax of a given language. As well as being a valid syntactical construct under our language of choice, CoffeeScript, the above bears further meaning. The above defines <code>whatDay</code> as equal to another expression. This expression is a <em>function definition</em>. Functions, like our definition of a program, map input values to an output. For this reason functions are often called subroutines, essentially, sub-programs.</p>
+
+<p>Our creation of the <code>whatDay</code> function follows the same pattern as any function&#8217;s definition would. Passed values, or parameters, are listed in parenthesis, e.g., <code>(day)</code>, and shown to map to a given expression by use of an arrow. Hence our function definition syntax fits the pattern of <code>&lt;var&gt; = (&lt;var&gt;,...) -&gt; &lt;expr&gt;</code>, where <code>&lt;var&gt;</code> represents a variable and <code>&lt;expr&gt;</code> represents an expression.</p>
+
+<p>The body of the <code>whatDay</code> function, that is, the expression following the arrow, consists of a <code>switch</code> statement. <code>switch</code> statements will be used very often and serve to determine a value, optionally based on a criterion, in this case <code>day</code>. Summarized, the body says, &#8220;When the day is 5, it&#8217;s Friday, otherwise it&#8217;s not Friday&#8221;.</p>
+
+<p>In the code above, the <code>whatDay</code> function accepts a day and returns whether it is Friday. Obviously, this program is not very complex and would not be very useful. Our next step is to generalize this coupling of values.</p>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>cons = </span><span class='nf'>(a, b) -&gt;</span> 
+	<span class='nf'>(option) -&gt;</span> <span class='k'>switch</span> <span class='nx'>option</span>
+		<span class='k'>when</span> <span class='kc'>true</span> <span class='k'>then</span> <span class='nx'>a</span>
+		<span class='k'>else</span> <span class='nx'>b</span>
+</code></pre></div>
+<p>You see that in <code>cons</code>, our pair constructor, the default and alternate values are passed as parameters, <code>a</code> and <code>b</code>. Additionally, the criterion that the day must equal 1 has been generalized. Rather, the passed value must be true. However, the structure remains the same. Putting this to use we have evaluation of the following expressions as displayed by the <code># =&gt;</code> annotations.</p>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>whatDay = </span><span class='nx'>cons</span><span class='p'>(</span><span class='s'>&quot;It&#39;s Friday!&quot;</span><span class='p'>,</span> <span class='s'>&quot;It&#39;s not Friday!&quot;</span><span class='p'>)</span>
+<span class='nx'>whatDay</span><span class='p'>(</span><span class='kc'>true</span><span class='p'>)</span> <span class='c1'># =&gt; &quot;It&#39;s Friday!&quot;</span>
+<span class='nx'>whatDay</span><span class='p'>(</span><span class='kc'>false</span><span class='p'>)</span> <span class='c1'># =&gt; &quot;It&#39;s not Friday!&quot;</span>
+</code></pre></div>
+<p>We have successfully generalized the idea of branching based on input, so let&#8217;s try to expand to allow for arbitrarily many options. You should note that henceforth cons will often be used in constructing nested pairs, our implementation of lists. Our nested pairs will be constructed as in the following code, where comments have been added of the form <code># ...</code> to make clear the reason for branching, analogous to our Friday-based branch shown previously.</p>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>whatAmI = </span><span class='nx'>cons</span><span class='p'>(</span>
+	<span class='c1'># Do you lack arms?</span>
+	<span class='s'>&quot;snake&quot;</span><span class='p'>,</span>
+	<span class='nx'>cons</span><span class='p'>(</span>
+		<span class='c1'># Are you fast?</span>
+		<span class='s'>&quot;leopard&quot;</span><span class='p'>,</span>
+		<span class='nx'>cons</span><span class='p'>(</span>
+			<span class='c1'># Are you slow?</span>
+			<span class='s'>&quot;sloth&quot;</span><span class='p'>,</span>
+			<span class='nx'>nil</span>
+		<span class='p'>)</span>
+	<span class='p'>)</span>
+<span class='p'>)</span>
+</code></pre></div>
+<p>The above serves as a tree of decisions, or given the taxonomical example, a <a href='http:#en.wikipedia.org/wiki/Single-access_key'>dichotomous key</a>. If a criterion is matched, a value is determined, and if not, additional criteria must be assessed. Eventually, additional branching will be impossible, so we write <code>nil</code> instead of a set of branches.</p>
+
+<p>This nesting of pairs serves as our implementation of lists. Lists consist of a &#8220;head&#8221; value and a &#8220;tail&#8221; value, with the tail being another list. To signal the end of a list&#8217;s nesting we make the tail empty, with a value we will call <code>nil</code>. By now you should have a firm grasp on the structure we have chosen for lists, as displayed by the following.</p>
+<div class='highlight'><pre><code class='coffeescript'><span class='nx'>cons</span><span class='p'>(</span><span class='mi'>1</span><span class='p'>,</span> <span class='nx'>cons</span><span class='p'>(</span><span class='mi'>2</span><span class='p'>,</span> <span class='nx'>cons</span><span class='p'>(</span><span class='mi'>3</span><span class='p'>,</span> <span class='nx'>nil</span><span class='p'>)))</span>
+</code></pre></div>
+<h2 id='a_note_on_our_current_implementation'>A Note on Our Current Implementation</h2>
+
+<p>The current implementation in which we are involved is odd for the following reason. We are implementing our data structures and simple operators on top of a completely robust language. Thus some odd definitions will arise, mostly only in our primitive values. These odd definitions would usually be those implemented in a machine specific manner, dealing with RAM and the inner-workings of a computer. The following will include a list of primitives, keep in mind that definitions of all these primitives are implementation specific and involve concepts upon which you should not dwell.</p>
+
+<h2 id='elementary_list_functions'>Elementary List Functions</h2>
+
+<p>We will now take a moment to discuss the elementary functions with which we can make more complex manipulations of our newly made data-structure.</p>
+
+<ul>
+<li><code>atom(x)</code> - returns <code>true</code> if the value is atomic, <code>false</code> if it is a list.</li>
+
+<li><code>x == y</code> - returns whether two atomic values are equal.</li>
+
+<li><code>car(x)</code> - returns the first value of a list, the head.</li>
+
+<li><code>cdr(x)</code> - returns the rest of a list, the tail.</li>
+
+<li><code>cons(x,y)</code> - constructs a list of the two provided values.</li>
+</ul>
+
+<p>The following are the CoffeeScript specific implementations of the above primitives which have yet to be defined.</p>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>atom = </span><span class='nf'>(x) -&gt;</span> <span class='k'>typeof</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span> <span class='o'>!=</span> <span class='s'>&#39;function&#39;</span>
+<span class='nv'>car = </span><span class='nf'>(x) -&gt;</span> <span class='nx'>x</span><span class='p'>(</span><span class='kc'>true</span><span class='p'>)</span>
+<span class='nv'>cdr = </span><span class='nf'>(x) -&gt;</span> <span class='nx'>x</span><span class='p'>(</span><span class='kc'>false</span><span class='p'>)</span>
+</code></pre></div>
+<p>All code written in this article is present in the file viewable <a href='https://gist.github.com/mattneary/5737278'>here</a>. You can follow along or execute the code in this file.</p>
+
+<h2 id='functions_on_recursive_pairs'>Functions on Recursive Pairs</h2>
+
+<p>Our chosen structure for lists is intentionally self-similar. Thus the best way of manipulating the lists is with recursive functions. A recursive function invokes itself. For example, a factorial function of 5 multiples 5 by the factorial of 4, that is, 5 by 4 by the factorial of 3, &#8230;, that is 5 by 4 by 3 by 2 by 1. Our functions will have a similar structure. Let&#8217;s begin with an example.</p>
+
+<ul>
+<li><code>ff(x)</code> - The first atomic value of a list, ignoring nesting.</li>
+</ul>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>ff = </span><span class='nf'>(list) -&gt;</span> <span class='k'>switch</span>
+	<span class='k'>when</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>car</span><span class='p'>(</span><span class='nx'>list</span><span class='p'>))</span> <span class='k'>then</span> <span class='nx'>car</span><span class='p'>(</span><span class='nx'>list</span><span class='p'>)</span>
+	<span class='k'>else</span> <span class='nx'>ff</span><span class='p'>(</span><span class='nx'>car</span><span class='p'>(</span><span class='nx'>list</span><span class='p'>))</span>
+</code></pre></div>
+<p>Let&#8217;s see how an example behaves.</p>
+<div class='highlight'><pre><code class='coffeescript'><span class='nx'>ff</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>),</span> <span class='nx'>c</span><span class='p'>))</span> 
+	<span class='o'>=</span> <span class='k'>switch</span>
+		<span class='k'>when</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>car</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>),</span> <span class='nx'>c</span><span class='p'>)))</span> <span class='k'>then</span> <span class='nx'>car</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>),</span> <span class='nx'>c</span><span class='p'>))</span>
+		<span class='k'>else</span> <span class='nx'>ff</span><span class='p'>(</span><span class='nx'>car</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>),</span> <span class='nx'>c</span><span class='p'>)))</span>
+	<span class='o'>=</span> <span class='k'>switch</span>
+		<span class='k'>when</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>))</span> <span class='k'>then</span> <span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>)</span>
+		<span class='k'>else</span> <span class='nx'>ff</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>))</span>
+	<span class='o'>=</span> <span class='k'>switch</span>
+		<span class='k'>when</span> <span class='kc'>false</span> <span class='k'>then</span> <span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>)</span>
+		<span class='k'>else</span> <span class='nx'>ff</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>))</span>
+	<span class='o'>=</span> <span class='nx'>ff</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>))</span>
+	<span class='o'>=</span> <span class='k'>switch</span>
+		<span class='k'>when</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>car</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>)))</span> <span class='k'>then</span> <span class='nx'>car</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>))</span>
+		<span class='k'>else</span> <span class='nx'>ff</span><span class='p'>(</span><span class='nx'>car</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>)))</span>
+	<span class='o'>=</span> <span class='k'>switch</span>
+		<span class='k'>when</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>)</span> <span class='k'>then</span> <span class='nx'>a</span>
+		<span class='k'>else</span> <span class='nx'>ff</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>)</span>
+	<span class='o'>=</span> <span class='k'>switch</span>
+		<span class='k'>when</span> <span class='kc'>true</span> <span class='k'>then</span> <span class='nx'>a</span>
+		<span class='k'>else</span> <span class='nx'>ff</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>)</span>
+	<span class='o'>=</span> <span class='nx'>a</span>
+</code></pre></div>
+<ul>
+<li><code>subst(a, b, x)</code> - The result of substituting <code>a</code> for <code>b</code> throughout nested pairs <code>x</code>.</li>
+</ul>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>subst = </span><span class='nf'>(a, b, x) -&gt;</span> <span class='k'>switch</span>
+	<span class='k'>when</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span> <span class='k'>then</span> <span class='p'>(</span><span class='k'>switch</span>
+		<span class='k'>when</span> <span class='nx'>x</span> <span class='o'>==</span> <span class='nx'>b</span> <span class='k'>then</span> <span class='nx'>a</span>
+		<span class='k'>else</span> <span class='nx'>x</span><span class='p'>)</span>
+	<span class='k'>else</span> <span class='nx'>cons</span><span class='p'>(</span><span class='nx'>subst</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>,</span> <span class='nx'>car</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)),</span> <span class='nx'>subst</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>,</span> <span class='nx'>b</span><span class='p'>,</span> <span class='nx'>cdr</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)))</span>
+</code></pre></div>
+<ul>
+<li><code>equal(x, y)</code> - returns <code>true</code> if <code>x</code> and <code>y</code> are the same list, <code>false</code> otherwise.</li>
+</ul>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>equal = </span><span class='nf'>(x, y) -&gt;</span> <span class='p'>(</span><span class='nx'>atom</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span> <span class='o'>and</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)</span> <span class='o'>and</span> <span class='nx'>x</span> <span class='o'>==</span> <span class='nx'>y</span><span class='p'>)</span> <span class='o'>or</span> 
+				  <span class='p'>(</span><span class='o'>not</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span> <span class='o'>and</span> <span class='o'>not</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)</span> <span class='o'>and</span> 
+				  <span class='nx'>equal</span><span class='p'>(</span><span class='nx'>car</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>),</span> <span class='nx'>car</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>))</span> <span class='o'>and</span> 
+				  <span class='nx'>equal</span><span class='p'>(</span><span class='nx'>cdr</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>),</span> <span class='nx'>cdr</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)))</span>
+</code></pre></div>
+<h2 id='lists'>Lists</h2>
+
+<p>We will now take a moment to create more legible notation for our nested pairs, or lists. The following axioms should make clear our new syntax. Note that as we are acting within CoffeeScript, a function is required to parse our new syntax, <code>_</code>. The mechanics of this function are irrelevant, as it serves only to allow a more concise notation.</p>
+
+<ol>
+<li><code>car(_(1,2,...n)) = 1</code></li>
+
+<li><code>cdr(_(1,2,...n)) = _(2,3,...n)</code></li>
+
+<li><code>cdr(_(1)) = nil</code></li>
+
+<li><code>cons(1, _(2,3,...n)) = _(1,2,...n)</code></li>
+
+<li><code>cons(1, nil) = _(1)</code></li>
+</ol>
+
+<p>The following is the CoffeeScript specific implementation of our <code>_</code> shorthand.</p>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>_ = </span><span class='nf'>(members...) -&gt;</span> <span class='k'>switch</span> <span class='nx'>members</span><span class='p'>.</span><span class='nx'>length</span>
+	<span class='k'>when</span> <span class='mi'>0</span> <span class='k'>then</span> <span class='nx'>nil</span>
+	<span class='k'>else</span> <span class='nx'>cons</span><span class='p'>(</span><span class='nx'>members</span><span class='p'>[</span><span class='mi'>0</span><span class='p'>],</span> <span class='nx'>_</span><span class='p'>.</span><span class='nx'>apply</span><span class='p'>({},</span> <span class='nx'>members</span><span class='p'>.</span><span class='nx'>slice</span><span class='p'>(</span><span class='mi'>1</span><span class='p'>)))</span>
+</code></pre></div>
+<p>Additionally we define <code>isNil(x)</code> as follows.</p>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>isNil = </span><span class='nf'>(x) -&gt;</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span> <span class='o'>and</span> <span class='nx'>x</span> <span class='o'>==</span> <span class='nx'>nil</span>
+</code></pre></div>
+<p>This function is often useful when dealing with lists. Compositions of <code>car</code> and <code>cdr</code> appear so often that we provide the following abbreviations.</p>
+
+<ul>
+<li><code>cadr(x)</code> for <code>car(cdr(x))</code></li>
+
+<li><code>caddr(x)</code> for <code>car(cdr(cdr(x)))</code>, etc.</li>
+</ul>
+
+<p>The following functions are useful when interpreting these nested pairs as lists.</p>
+
+<ul>
+<li><code>append(x,y)</code></li>
+</ul>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>append = </span><span class='nf'>(x,y) -&gt;</span> <span class='k'>switch</span>
+	<span class='k'>when</span> <span class='nx'>isNil</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span> <span class='k'>then</span> <span class='nx'>y</span>
+	<span class='k'>else</span> <span class='nx'>cons</span><span class='p'>(</span><span class='nx'>car</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>),</span> <span class='nx'>append</span><span class='p'>(</span><span class='nx'>cdr</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>),</span> <span class='nx'>y</span><span class='p'>))</span>
+</code></pre></div>
+<p>As an example, <code>append(_(a,b), _(c,d,e))</code> = <code>_(a,b,c,d,e)</code>.</p>
+
+<ul>
+<li><code>among(x,y)</code> - returns <code>true</code> if the expression <code>x</code> occurs as a member of the list <code>y</code>.</li>
+</ul>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>among = </span><span class='nf'>(x,y) -&gt;</span> <span class='o'>not</span> <span class='nx'>isNil</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)</span> <span class='o'>and</span> <span class='p'>(</span><span class='nx'>equal</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>,</span> <span class='nx'>car</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>))</span> 
+				 <span class='o'>or</span> <span class='nx'>among</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>,</span> <span class='nx'>cdr</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)))</span>
+</code></pre></div>
+<ul>
+<li><code>pair(x,y)</code> - pairs up corresponding items of two lists</li>
+</ul>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>pair = </span><span class='nf'>(x,y) -&gt;</span> <span class='k'>switch</span>
+	<span class='k'>when</span> <span class='nx'>isNil</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span> <span class='o'>and</span> <span class='nx'>isNil</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)</span> <span class='k'>then</span> <span class='nx'>nil</span>
+	<span class='k'>when</span> <span class='o'>not</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span> <span class='o'>and</span> <span class='o'>not</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)</span> <span class='k'>then</span> 
+		 <span class='nx'>cons</span><span class='p'>(</span><span class='nx'>cons</span><span class='p'>(</span><span class='nx'>car</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>),</span> <span class='nx'>cons</span><span class='p'>(</span><span class='nx'>car</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>),</span> <span class='nx'>nil</span><span class='p'>)),</span> 
+		 	  <span class='nx'>pair</span><span class='p'>(</span><span class='nx'>cdr</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>),</span> <span class='nx'>cdr</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)))</span>
+	<span class='k'>else</span> <span class='nx'>nil</span>
+</code></pre></div>
+<ul>
+<li><code>assoc(x,y)</code> - For <code>y</code> of the form <code>_(_(u1, v1), ..._(un, vn))</code> and <code>x</code> is one of the u&#8217;s, then <code>assoc(x,y)</code> is the corresponding v.</li>
+</ul>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>assoc = </span><span class='nf'>(x,y) -&gt;</span> <span class='k'>switch</span>
+	<span class='k'>when</span> <span class='nx'>caar</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)</span> <span class='o'>==</span> <span class='nx'>x</span> <span class='k'>then</span> <span class='nx'>cadar</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)</span>
+	<span class='k'>else</span> <span class='nx'>assoc</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>,</span> <span class='nx'>cdr</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>))</span>
+</code></pre></div>
+<ul>
+<li><code>sublis(x,y)</code> - For <code>x</code> of the form <code>_(_(u1, v1), ..._(un, vn))</code> where each <code>u</code> is atomic and <code>y</code> may be any expression, <code>sublis(x,y)</code> is the result of substituting each <code>v</code> for the corresponding <code>u</code> in <code>y</code>. We start by defining an intermediary function.</li>
+</ul>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>sub2 = </span><span class='nf'>(x,z) -&gt;</span> <span class='k'>switch</span>
+	<span class='k'>when</span> <span class='nx'>isNil</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span> <span class='k'>then</span> <span class='nx'>z</span> 
+	<span class='k'>when</span> <span class='nx'>equal</span><span class='p'>(</span><span class='nx'>caar</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>),</span> <span class='nx'>z</span><span class='p'>)</span> <span class='k'>then</span> <span class='nx'>cadar</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span>
+	<span class='k'>else</span> <span class='nx'>sub2</span><span class='p'>(</span><span class='nx'>cdr</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>),</span> <span class='nx'>z</span><span class='p'>)</span>
+</code></pre></div>
+<p>and</p>
+<div class='highlight'><pre><code class='coffeescript'><span class='nv'>sublis = </span><span class='nf'>(x, y) -&gt;</span> <span class='k'>switch</span>
+	<span class='k'>when</span> <span class='nx'>atom</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)</span> <span class='k'>then</span> <span class='nx'>sub2</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>,</span> <span class='nx'>y</span><span class='p'>)</span>
+	<span class='k'>else</span> <span class='nx'>cons</span><span class='p'>(</span><span class='nx'>sublis</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>,</span> <span class='nx'>car</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)),</span> <span class='nx'>sublis</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>,</span> <span class='nx'>cdr</span><span class='p'>(</span><span class='nx'>y</span><span class='p'>)))</span>
+</code></pre></div>
+<h2 id='interpretation_of_programming_languages'>Interpretation of Programming Languages</h2>
+
+<p>We have successfully amassed a library of useful functions on our lists. This library directly corresponds with that built-up in <a href='http://en.wikipedia.org/wiki/John_McCarthy_(computer_scientist'>John McCarthy</a>)&#8217;s paper, <a href='http://www-formal.stanford.edu/jmc/recursive.pdf'>Recursive Functions of Symbolic Expressions and Their Computation by Machine</a>. At this point he goes on to discuss the interpretation and implementation of the language on which his paper was written. We, however, will not discuss an interpreter of CoffeeScript.</p>
+
+<p>At this point I would suggest you either jump right into McCarthy&#8217;s <a href='http://www-formal.stanford.edu/jmc/recursive.pdf'>paper</a>, or become familiar with interpretation through an article written in JavaScript, the language on which CoffeeScript is based, right <a href='http://mattneary.com/#!/interpret.md'>here</a>. Additionally, I have written an article on bootstrapping lambda calculus <a href='http://mattneary.com/#!/bootstrap.md'>here</a>.</p>
+</div>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+  	"HTML-CSS": { linebreaks: { automatic: true } },
+  	tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+  });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+</script>
+
+            <div class="footer">
+              <div class="contact">
+                <p>
+                  Matt Neary<br />
+                  Editor in Chief<br />
+                  neary.matt@gmail.com
+                </p>
+              </div>
+              <div class="contact">
+                <p>
+                  <a href="http://github.com/mattneary/">github.com/mattneary</a><br />
+                  <a href="http://twitter.com/matt3141/">twitter.com/matt3141</a><br />
+                </p>
+              </div>
+            </div>
+          </div>
+        </div> <!-- /container -->
+
+    </body>
+</html>

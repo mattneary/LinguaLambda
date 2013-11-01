@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>A Bottom-Up Approach to Programming in Lambda Calculus</title>
+        <meta name="viewport" content="width=device-width">
+
+        <!-- syntax highlighting CSS -->
+        <link rel="stylesheet" href="/css/syntax.css">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+    </head>
+    <body>
+
+        <div class="container">
+          <div class="site">
+            <div class="header">
+              <h1 class="title"><a href="/">Lingua Lambda</a></h1>
+<!--              <a class="extra" href="/">home</a><br>          -->
+              <em>traversing the tongues of computation</em>
+            </div>
+
+                <h2>A Bottom-Up Approach to Programming in Lambda Calculus</h2>
+<p class="meta">01 May 2013</p>
+
+<div class="post">
+<p>Lambda Calculus is a very bare-bones language, and at first site it seems full-fledged programs would be impossible in such a syntactically restrictive language. However, with certain design decisions made from within the language, we can make a more welcoming environment for development.</p>
+
+<h2 id='topdown_hacks'>Top-Down Hacks</h2>
+
+<p>Unfortunately, there are a couple areas in which we cannot build up features from within the language and we will touch briefly on these topics.</p>
+
+<h3 id='recursion'>Recursion</h3>
+
+<p>As one would expect from a functional language, recursion plays a huge role in the implementation of algorithms in the Lambda Calculus. To aid in recursion, we will construct two functions to control evaluation of expressions, preventing infinitely recursive definitions.</p>
+
+<p>The first of the functions is &#8221;`&#8221;. The function &#8221;`&#8221; may be referred to as the quote function and delays evaluation of an expression. It is equivalent to the prefix <code>λ_-&gt;</code>.</p>
+
+<p>The second of the functions is &#8221;,&#8221;. The function &#8221;,&#8221; unquotes expressions, and thus will evaluate a &#8220;queued&#8221; value after deciding a branch in recursion.</p>
+
+<p>As an example, we define the factorial function as follows, where <code>PRED</code> is the predecessor function and <code>MULT</code> is multiplication.</p>
+
+<pre><code>FACT = λn-&gt;, ((ISZERO n) (` ONE) (` MULT n (FACT (PRED n))))</code></pre>
+
+<h3 id='output'>Output</h3>
+
+<p>Functions for outputting values to the outside-world are provided, namely, <code>NUM</code>, <code>BOOL</code>, <code>CHAR</code>, and <code>LIST</code>. Their respective uses are self-evident. Future examples will include outputted values beneath certain expressions, the use of an output function is intended to be implied. Additionally, you may wish to note the format of these annotations; &#8221;`&#8221; can be used to mark a line as a comment.</p>
+
+<h2 id='numbers'>Numbers</h2>
+
+<p>Everything in Lambda Calculus is a function, and so in order to represent numbers, we will need to design a functional interpretation of numbers themselves. The <a href='http://en.wikipedia.org/wiki/Church_numeral'>standard</a> interpretation is as an iterator of a function on a base value, so <code>5 SUCC 0</code> would be the successor of the successor &#8230; of 0, five times applied, i.e., 5.</p>
+
+<p>As you can see, a number <code>n</code>, serves as a means of applying a function <code>n</code> times to a base value. This is a very fundamental concept in Lambda Calculus; however, we will build upon this for the sake of convenience in implementation. Our goal will be to construct a function of digits bearing their value as a decimal string.</p>
+
+<pre><code>NAUGHT = λf-&gt;λn-&gt;TRUE	
+ISNAUGHT = λn-&gt;n (λx-&gt;x) FALSE
+. = NAUGHT
+# = λA-&gt;λB-&gt;(ISNAUGHT B) A (# (ADD (MULT TEN A) B))
+# 1 1 0 .
+` =&gt; 110</code></pre>
+
+<p>Note that <code>NAUGHT</code> (or its alias <code>.</code>) is used as a delimiter of the numbers, a standard of our designs. Henceforth we will take it as a given that each single digit number represents its functional form. Exploring further this idea of n-ary functions of numbers, we will implement a sum function.</p>
+
+<pre><code>ADD = λA-&gt;λB-&gt;A SUCC B
++ = λA-&gt;λB-&gt;(ISNAUGHT B) A (+ (ADD A B))
++ 9 4 3 .
+` =&gt; 16</code></pre>
+
+<p>We now wish to expand this idea of n-ary functions to other types, calling upon the idea of polymorphism.</p>
+
+<h2 id='polymorphism'>Polymorphism</h2>
+
+<p>Polymorphism is the quality of a function that works on multiple types. Our idea of polymorphism will we wrapping values as singletons to allow for a sort of generic type, a list type. For convenience, we will begin by defining shorthands for converting to and from singletons.</p>
+
+<pre><code>* = λA-&gt;PAIR A NIL
+&amp; = FST</code></pre>
+
+<p>The first advantage of polymorphism we will encounter is the ability to have a universal delimiter, <code>NIL</code>, that works with lists of all sorts. This will allow us to make an n-ary function composer, which would have otherwise been impossible, given that the arity of functions varies and thus evaluation of an arbitrary function would be impossible, thus determination of a delimiter, in turn, would be impossible. The definition of this composer is as follows.</p>
+
+<pre><code>; = NIL
+.* = λX-&gt;λF-&gt;(NULL F) X (.* ((&amp; F) X))
+.* 2 (* (ADD 3)) (* (ADD 4)) ;
+` =&gt; 9</code></pre>
+
+<p>We have created a shorthand for <code>NIL</code> analogous to our previous definition of <code>.</code>. Note that we made use of our singleton shorthands and, furthermore, that we chose to name the composer <code>.*</code>. The <code>*</code> reflects that this is an n-ary, polymorphic function. We will now define another n-ary, polymorphic function, this time a list constructor.</p>
+
+<p>This list constructor will prove to have a rather complex implementation, one drawing upon many concepts.</p>
+
+<pre><code>PUSH = λL-&gt;λX-&gt;, ((NULL (SND L)) (` PAIR (FST L) (PAIR X NIL)) (` PAIR (FST L) (PUSH (SND L) X)))
+CONS* = λA-&gt;λB-&gt;(NULL B) A (CONS* (PUSH A (&amp; B)))
+CONS* (* 1) (* TRUE) (* 2) ;
+` =&gt; (1,(TRUE,(2,())))</code></pre>
+
+<p>As you can see, we began by defining a push function that serves to insert a given value at the end of a list. We then defined <code>CONS*</code> recursively as a list having pushed passed values, converted from singletons, to its end. This notation that allows for polymorphic functions can at times prove very cumbersome and even superfluous. For this sake, we will provide a means of converting n-ary, polymorphic functions to their number-specific form. Drawing from Mathematics we will call this function <code>Z</code>.</p>
+
+<pre><code>Z = λF-&gt;λX-&gt;(ISNAUGHT X) (F NIL) (Z (F (* X)))
+Z CONS* 1 2 3 .
+` =&gt; (1,(2,(3,())))</code></pre>
+
+<h2 id='lists'>Lists</h2>
+
+<p>With a solid foundation for lists, having built <code>PUSH</code> and <code>CONS*</code> functions, we will attempt to implement a couple functions very useful in dealing with lists, namely, <code>MAP</code> and <code>REDUCE</code>.</p>
+
+<pre><code>MAP = λF-&gt;λL-&gt;, ((NULL L) (` NIL) (` PAIR (F (FST L)) (MAP F (SND L))))
+REDUCE = λF-&gt;λA-&gt;λL-&gt;, ((NULL L) (` A) (` REDUCE F (F A (FST L)) (SND L)))
+NUMS = MAP SUCC (Z CONS* 1 2 3 .)
+` =&gt; (2,(3,(4,())))
+REDUCE ADD NUMS
+` =&gt; 9</code></pre>
+
+<p>We now have some simple ways of manipulating lists, and hopefully the methods used in performing such manipulations are somewhat evident. To output these lists, one uses the <code>LIST</code> function. For example:</p>
+
+<pre><code>LIST NUM (Z CONS* 1 2 3 NAUGHT)
+` =&gt; 1:2:3:[]</code></pre>
+
+<p>However, given that the <code>CONS*</code> function is polymorphic, we may wish to output mixed values, in which case the providing of a type rendering function, e.g., <code>NUM</code>, would not be possible. Thus we will now investigate explicit typing of values.</p>
+
+<h2 id='types'>Types</h2>
+
+<p>For the explicit typing of values, the functions <code>*NUM</code>, <code>*BOOL</code>, <code>*CHAR</code>, and <code>*LIST</code> are included. Other than <code>*LIST</code>, which maps an explicitly typed list to its rendered values, the typing functions serve as a means of explicitly providing the type of a value. Additionally, <code>ID</code> either outputs an already rendered value, or can serve as the type of a list to be outputted, namely, one that contains already rendered values. For example:</p>
+
+<pre><code>ID (*NUM 1)
+` =&gt; 1
+LIST ID (*LIST (CONS* (* (PAIR *NUM 9)) (PAIR *BOOL TRUE) NIL))
+` =&gt; 9:true:[]</code></pre>
+
+<p>Note that explicitly typed lists contain type-value pairs, e.g., <code>PAIR *NUM 9</code>. Recall, also, that <code>*LIST</code> renders an explicitly typed list, and <code>ID</code> should then be paired with <code>LIST</code> to output these values. This system of typing may seem overly complex, but provides the power to render arbitrary structures when debugging, for example.</p>
+
+<h2 id='text'>Text</h2>
+
+<p>Text strings are a very natural continuation of previously covered topics. A string is merely a list of numbers, and so we have already discussed a means of constructing them. Additionally, a special outputting function is provided for strings to exclude the punctuation of a generic list, namely, <code>STRING</code>.</p>
+
+<pre><code>GREET = (Z CONS* (# 9 7 NAUGHT) (# 9 8 NAUGHT) (# 9 9 NAUGHT) NAUGHT)
+STRING GREET
+` =&gt; &quot;abc&quot;</code></pre>
+
+<h2 id='conclusion'>Conclusion</h2>
+
+<p>We have implemented functions to simplify the handling of numbers, booleans, and lists. Additionally, we discussed polymorphism and typing in the Lambda Calculus, a very difficult but necessary topic to address. With these functions in your toolkit, either by your own inclusion of them or your use of <a href='https://github.com/mattneary/Lambda-Calculus-Interpreter'>my interpreter</a>, the potential to develop full-fledged programs in the Lambda Calculus is hopefully a lot clearer. Our next steps will be in compiling a language of higher abstraction down to the lambda calculus, allowing us to realize the potential of the lambda calculus.</p>
+</div>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+  	"HTML-CSS": { linebreaks: { automatic: true } },
+  	tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+  });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+</script>
+
+            <div class="footer">
+              <div class="contact">
+                <p>
+                  Matt Neary<br />
+                  Editor in Chief<br />
+                  neary.matt@gmail.com
+                </p>
+              </div>
+              <div class="contact">
+                <p>
+                  <a href="http://github.com/mattneary/">github.com/mattneary</a><br />
+                  <a href="http://twitter.com/matt3141/">twitter.com/matt3141</a><br />
+                </p>
+              </div>
+            </div>
+          </div>
+        </div> <!-- /container -->
+
+    </body>
+</html>

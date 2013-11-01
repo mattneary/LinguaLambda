@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Testing JSON APIs with Quizzical</title>
+        <meta name="viewport" content="width=device-width">
+
+        <!-- syntax highlighting CSS -->
+        <link rel="stylesheet" href="/css/syntax.css">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+    </head>
+    <body>
+
+        <div class="container">
+          <div class="site">
+            <div class="header">
+              <h1 class="title"><a href="/">Lingua Lambda</a></h1>
+<!--              <a class="extra" href="/">home</a><br>          -->
+              <em>traversing the tongues of computation</em>
+            </div>
+
+                <h2>Testing JSON APIs with Quizzical</h2>
+<p class="meta">15 Jul 2013</p>
+
+<div class="post">
+<p>Testing is a very important part of development that aims to verify your code. Beyond that, testing also takes away any fear of refactoring, assuring that you don&#8217;t break anything. Despite these benefits, some developers find it too much an inconvenience to bother with, especially when dealing with complex problems like asynchronicity and concurrency. However, the tool I&#8217;ve been working on, Quizzical, is a suite of scripts that aims to make writing these tests as easy as possible.</p>
+
+<h2 id='on_apis'>On APIs</h2>
+
+<p>APIs (Application Programming Interfaces) provide endpoints for use within programs allowing one application to work with another. We will be discussing web APIs, like Twitter&#8217;s, Facebook&#8217;s or one that you will be writing soon. There are a couple things all of these APIs have in common: (a) all will be web APIs, and (b) all will serve JSON responses. These criteria are the only ones required for Quizzical to work for you.</p>
+
+<h2 id='on_curl'>On CURL</h2>
+
+<p>CURL is a Unix utility for the performance of HTTP requests of all kinds. CURL is super-easy, extremely versatile, and clear-and-concise. It&#8217;s no surprise that it is the favorite testing tool of many web developers.</p>
+
+<p>Quizzical doesn&#8217;t aim to dethrone CURL, but rather, to introduce it to automated testing. Automated Tests take a list of assertions to check, such as, &#8220;That button should be blue&#8221;, and determine that it has either passed or failed.</p>
+
+<h2 id='quizzical'>Quizzical</h2>
+
+<h3 id='getting_started'>Getting Started</h3>
+
+<p>Quizzical solves a very specific problem - testing a JSON API with CURL. CURL has a very clear and concise notation for expressing the specifications of an API in docs, etc. Additionally, CURL is a cross-platform standard in HTTP requests. All tests are of the following form.</p>
+<div class='highlight'><pre><code class='bash'>curl -s http://localhost:8080/api/boards/123 | <span class='nv'>$assert</span> <span class='s2'>&quot;board access&quot;</span> <span class='nv'>success</span><span class='o'>=</span><span class='nb'>true</span>
+</code></pre></div>
+<p>The <code>curl</code> progress dialogues are suppressed with <code>-s</code>, and then the response is piped to the assertion checker script. A name for the test and criteria are passed as arguments. These criteria are assessed on the JSON response, with <code>@</code> being a special symbol for equality with the entire response, e.g., <code>@={}</code>.</p>
+
+<h3 id='utility'>Utility</h3>
+
+<p>What advantages does Quizzical introduce? Quizzical makes testing as easy as CURL, and as pretty as CURL. That may seem trivial, but it can really lower barrier to entry into testing, and make it as friendly as possible.</p>
+
+<p>Beyond ease of use, Quizzical also makes tests look like documentation. Programmers of any language are familiar with CURL and so your tests will fully communicate the details of the web request at hand.</p>
+
+<h2 id='testdriven_development'>Test-Driven Development</h2>
+
+<p>There is a methodology in programming known as test-driven development. Test-driven development entails writing tests first, and passing them second. Hence the usual workflow would be along the lines of writing application specifications, converting those into verifiable tests, and then passing those tests one by one.</p>
+
+<p>Quizzical is great for use in test-driven development, because Quizzical tests look just like documentation. This cuts out a step in the process! Let&#8217;s say you want to make a web-service returning information about animals. Then your specifications may look something like the following.</p>
+<div class='highlight'><pre><code class='bash'>curl -s http://app.com/api/animals | <span class='nv'>$assert</span> <span class='s2'>&quot;List animals&quot;</span> <span class='nv'>first</span><span class='o'>=</span>Aardvark
+
+curl -s http://app.com/api/animals/ox | <span class='nv'>$assert</span> <span class='s2'>&quot;Access Animal&quot;</span> <span class='nv'>name</span><span class='o'>=</span>Ox
+
+curl -s http://app.com/api/animals <span class='se'>\</span>
+	-d <span class='s2'>&quot;{</span>
+<span class='s2'>		\&quot;name\&quot;: \&quot;Polar Bear\&quot;, \</span>
+<span class='s2'>		\&quot;type\&quot;: \&quot;Bear\&quot;</span>
+<span class='s2'>	}&quot;</span> | <span class='nv'>$assert</span> <span class='s2'>&quot;Create Animal&quot;</span> <span class='nv'>success</span><span class='o'>=</span><span class='nb'>true</span>
+</code></pre></div>
+<p>These are very legible specifications with clear requirements, e.g., <code>first=Aardvark</code>, and more importantly, valid Quizzical tests.</p>
+
+<h2 id='roadmap'>Roadmap</h2>
+
+<p>Quizzical is in the early stage of development. It was built to solve a very specific problem of mine and met my needs at the time. However, it needs more complex JSON assessment, and maybe sub-routines to be full-featured. Find Quizzical <a href='https://github.com/mattneary/Quizzical'>on github</a>.</p>
+</div>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+  	"HTML-CSS": { linebreaks: { automatic: true } },
+  	tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+  });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+</script>
+
+            <div class="footer">
+              <div class="contact">
+                <p>
+                  Matt Neary<br />
+                  Editor in Chief<br />
+                  neary.matt@gmail.com
+                </p>
+              </div>
+              <div class="contact">
+                <p>
+                  <a href="http://github.com/mattneary/">github.com/mattneary</a><br />
+                  <a href="http://twitter.com/matt3141/">twitter.com/matt3141</a><br />
+                </p>
+              </div>
+            </div>
+          </div>
+        </div> <!-- /container -->
+
+    </body>
+</html>

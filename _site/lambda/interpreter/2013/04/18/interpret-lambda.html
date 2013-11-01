@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>On the Interpretation of Lambda Calculus</title>
+        <meta name="viewport" content="width=device-width">
+
+        <!-- syntax highlighting CSS -->
+        <link rel="stylesheet" href="/css/syntax.css">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/css/main.css">
+
+    </head>
+    <body>
+
+        <div class="container">
+          <div class="site">
+            <div class="header">
+              <h1 class="title"><a href="/">Lingua Lambda</a></h1>
+<!--              <a class="extra" href="/">home</a><br>          -->
+              <em>traversing the tongues of computation</em>
+            </div>
+
+                <h2>On the Interpretation of Lambda Calculus</h2>
+<p class="meta">18 Apr 2013</p>
+
+<div class="post">
+<p>The idea of computational equivalency was first suggested by Alan Turing; it has since played a fundamental role in our understanding of computation. Turing proposed the idea of universal computation machines, now known by the name of Universal Turing Machines, saying that some mechanical devices are capable of simulating all others. A profound concept which we will take advantage of in our interpretation of one language within another, namely, the interpretation of the Lambda Calculus in JavaScript.</p>
+
+<h2 id='why'>Why?</h2>
+
+<p>You may feel no motivation to write an interpreter, thinking there is no direct application of what it may teach you. I strongly encourage you to give it a try; it&#8217;s not as hard as one might think, and exhibits an extremely valuable skill. I think <a href='http://composition.al/blog/2013/06/23/write-an-interpreter/'>Lindsey Kuper</a> puts it best:</p>
+
+<blockquote>
+<p>To me, one reason is that an interpreter is the quintessential program that operates on programs. To be comfortable with interpreters is to be comfortable with the idea of code as data, a powerful and ubiquitous idea. Programs that operate on programs include things like interpreters and compilers, but also things like emulators and debuggers. Much of the programming world regards these kinds of programs as magical, but they aren’t.</p>
+</blockquote>
+
+<h2 id='parsing'>Parsing</h2>
+
+<p>Lambda Calculus has very simple notation which we can summarize as follows:</p>
+
+<pre><code>&lt;exp&gt; ::= &lt;var&gt;
+		| &lt;exp&gt; &lt;exp&gt;
+		| λ&lt;var&gt; -&gt; &lt;exp&gt;</code></pre>
+
+<p>For the sake of simplicity we will add variable declaration, rather than rely purely on function arguments. We now have:</p>
+
+<pre><code>&lt;exp&gt; ::= &lt;var&gt;
+		| &lt;exp&gt; &lt;exp&gt;
+		| λ&lt;var&gt; -&gt; &lt;exp&gt;
+		| &lt;var&gt; = &lt;exp&gt;</code></pre>
+
+<p>Knowing these syntactic rules, parsing of expressions is rather straight forward. To begin, we will come up with rules for recognizing each of the expression types, then we will delegating to a parser of that type. We use the following RegEx rules.</p>
+<div class='highlight'><pre><code class='javascript'><span class='kd'>var</span> <span class='nx'>rules</span> <span class='o'>=</span> <span class='p'>[</span>
+	<span class='p'>[</span><span class='sr'>/^[^=]+=[^=]+$/</span><span class='p'>,</span> <span class='nx'>equation_parse</span><span class='p'>],</span>
+	<span class='p'>[</span><span class='sr'>/^[^-]+-&gt;[\S\s]+$/</span><span class='p'>,</span> <span class='nx'>lambda_parse</span><span class='p'>],</span>
+	<span class='p'>[</span><span class='sr'>/^[\S]+ [\S\s]+$/</span><span class='p'>,</span> <span class='nx'>invocation_parse</span><span class='p'>],</span>
+	<span class='p'>[</span><span class='sr'>/^/</span><span class='p'>,</span> <span class='nx'>identity</span><span class='p'>]</span>
+<span class='p'>];</span>
+</code></pre></div>
+<p>Now we can declare the parsing functions that correspond. Notice that each function breaks the expression down into an operation followed by parameters in a list, or alternatively returns the identity.</p>
+<div class='highlight'><pre><code class='javascript'><span class='kd'>var</span> <span class='nx'>identity</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='k'>return</span> <span class='nx'>x</span><span class='p'>;</span>
+<span class='p'>};</span>
+<span class='kd'>var</span> <span class='nx'>equation_parse</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>expr</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='kd'>var</span> <span class='nx'>parts</span> <span class='o'>=</span> <span class='nx'>expr</span><span class='p'>.</span><span class='nx'>split</span><span class='p'>(</span><span class='sr'>/\s*=\s*/</span><span class='p'>);</span>
+  <span class='k'>return</span> <span class='p'>[</span><span class='s1'>&#39;=&#39;</span><span class='p'>,</span> <span class='nx'>parts</span><span class='p'>[</span><span class='mi'>0</span><span class='p'>],</span> <span class='nx'>parse</span><span class='p'>(</span><span class='nx'>parts</span><span class='p'>[</span><span class='mi'>1</span><span class='p'>])];</span>
+<span class='p'>};</span>
+<span class='kd'>var</span> <span class='nx'>lambda_parse</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>expr</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='kd'>var</span> <span class='nx'>parts</span> <span class='o'>=</span> <span class='nx'>expr</span><span class='p'>.</span><span class='nx'>split</span><span class='p'>(</span><span class='s1'>&#39;-&gt;&#39;</span><span class='p'>);</span>
+  <span class='k'>return</span> <span class='p'>[</span><span class='s1'>&#39;lambda&#39;</span><span class='p'>,</span> <span class='nx'>parts</span><span class='p'>[</span><span class='mi'>0</span><span class='p'>].</span><span class='nx'>substr</span><span class='p'>(</span><span class='mi'>1</span><span class='p'>),</span> <span class='nx'>parse</span><span class='p'>(</span><span class='nx'>parts</span><span class='p'>.</span><span class='nx'>slice</span><span class='p'>(</span><span class='mi'>1</span><span class='p'>).</span><span class='nx'>join</span><span class='p'>(</span><span class='s1'>&#39;-&gt;&#39;</span><span class='p'>))];</span>
+<span class='p'>};</span>
+<span class='kd'>var</span> <span class='nx'>invocation_recursive_parse</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>fn</span><span class='p'>,</span> <span class='nx'>arguments</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='kd'>var</span> <span class='nx'>arg</span> <span class='o'>=</span> <span class='nx'>arguments</span><span class='p'>.</span><span class='nx'>shift</span><span class='p'>(),</span>
+      <span class='nx'>application</span> <span class='o'>=</span> <span class='p'>[</span><span class='nx'>fn</span><span class='p'>,</span> <span class='nx'>arg</span><span class='p'>.</span><span class='nx'>match</span><span class='p'>(</span><span class='sr'>/^\([\s\S]+\)$/</span><span class='p'>)</span> <span class='o'>?</span> <span class='nx'>parse</span><span class='p'>(</span><span class='nx'>arg</span><span class='p'>.</span><span class='nx'>substr</span><span class='p'>(</span><span class='mi'>1</span><span class='p'>,</span> <span class='nx'>arg</span><span class='p'>.</span><span class='nx'>length</span><span class='o'>-</span><span class='mi'>2</span><span class='p'>))</span> <span class='o'>:</span> <span class='nx'>arg</span><span class='p'>];</span>
+  <span class='k'>return</span> <span class='nx'>arguments</span><span class='p'>.</span><span class='nx'>length</span> <span class='o'>&gt;</span> <span class='mi'>0</span> <span class='o'>?</span> <span class='nx'>invocation_recursive_parse</span><span class='p'>(</span><span class='nx'>application</span><span class='p'>,</span> <span class='nx'>arguments</span><span class='p'>)</span> <span class='o'>:</span> <span class='nx'>application</span><span class='p'>;</span>
+<span class='p'>};</span>
+<span class='kd'>var</span> <span class='nx'>invocation_parse</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>expr</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='kd'>var</span> <span class='nx'>parts</span> <span class='o'>=</span> <span class='nx'>expr</span><span class='p'>.</span><span class='nx'>match</span><span class='p'>(</span><span class='sr'>/\([\S\s]+\)|[^)(\s]+/g</span><span class='p'>);</span>
+  <span class='c1'>// To handle currying and parenthesis, we delegate to a recursive parser</span>
+  <span class='k'>return</span> <span class='nx'>invocation_recursive_parse</span><span class='p'>(</span><span class='nx'>parts</span><span class='p'>[</span><span class='mi'>0</span><span class='p'>],</span> <span class='nx'>parts</span><span class='p'>.</span><span class='nx'>slice</span><span class='p'>(</span><span class='mi'>1</span><span class='p'>));</span>
+<span class='p'>};</span>
+</code></pre></div>
+<p>As an example, the parsed form of a simple expression follows.</p>
+<div class='highlight'><pre><code class='javascript'><span class='c1'>// expression:</span>
+<span class='s2'>&quot;SUCC = λn-&gt;λf-&gt;λx-&gt;f(n f x)&quot;</span><span class='p'>;</span>
+<span class='c1'>// parsed form:</span>
+<span class='p'>[</span><span class='s2'>&quot;=&quot;</span><span class='p'>,</span> <span class='s2'>&quot;SUCC&quot;</span><span class='p'>,</span> <span class='p'>[</span><span class='s2'>&quot;lambda&quot;</span><span class='p'>,</span> <span class='s2'>&quot;n&quot;</span><span class='p'>,</span> <span class='p'>[</span><span class='s2'>&quot;lambda&quot;</span><span class='p'>,</span> <span class='s2'>&quot;f&quot;</span><span class='p'>,</span> <span class='p'>[</span><span class='s2'>&quot;lambda&quot;</span><span class='p'>,</span> <span class='s2'>&quot;x&quot;</span><span class='p'>,</span> <span class='p'>[</span><span class='s2'>&quot;f&quot;</span><span class='p'>,</span> <span class='p'>[[</span><span class='s2'>&quot;n&quot;</span><span class='p'>,</span> <span class='s2'>&quot;f&quot;</span><span class='p'>],</span> <span class='s2'>&quot;x&quot;</span><span class='p'>]]]]]]</span>
+</code></pre></div>
+<p>Now, putting it all together, we create a function <code>parse</code> that accepts an expression and parses it recursively reducing to fundamental operations applied to variables.</p>
+<div class='highlight'><pre><code class='javascript'><span class='kd'>var</span> <span class='nx'>parse</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>expr</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='cm'>/*</span>
+<span class='cm'>  &lt;exp&gt; ::= &lt;var&gt;</span>
+<span class='cm'>         | &lt;exp&gt; &lt;exp&gt;</span>
+<span class='cm'>         | λ&lt;var&gt; -&gt; &lt;exp&gt;</span>
+<span class='cm'>         | &lt;var&gt; = &lt;exp&gt;</span>
+<span class='cm'>  */</span>
+  <span class='kd'>var</span> <span class='nx'>rules</span> <span class='o'>=</span> <span class='p'>[</span>
+    <span class='p'>[</span><span class='sr'>/^[^=]+=[^=]+$/</span><span class='p'>,</span> <span class='nx'>equation_parse</span><span class='p'>],</span>
+    <span class='p'>[</span><span class='sr'>/^[^-]+-&gt;[\S\s]+$/</span><span class='p'>,</span> <span class='nx'>lambda_parse</span><span class='p'>],</span>
+    <span class='p'>[</span><span class='sr'>/^[\S]+ [\S\s]+$/</span><span class='p'>,</span> <span class='nx'>invocation_parse</span><span class='p'>],</span>
+    <span class='p'>[</span><span class='sr'>/^/</span><span class='p'>,</span> <span class='nx'>identity</span><span class='p'>]</span>
+  <span class='p'>];</span>
+  <span class='c1'>// parse expression with matching rule</span>
+  <span class='kd'>var</span> <span class='nx'>parsed</span><span class='p'>;</span>
+  <span class='nx'>rules</span><span class='p'>.</span><span class='nx'>forEach</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>rule</span><span class='p'>)</span> <span class='p'>{</span>
+    <span class='k'>if</span><span class='p'>(</span> <span class='nx'>rule</span><span class='p'>[</span><span class='mi'>0</span><span class='p'>].</span><span class='nx'>test</span><span class='p'>(</span><span class='nx'>expr</span><span class='p'>)</span> <span class='o'>&amp;&amp;</span> <span class='o'>!</span><span class='nx'>parsed</span> <span class='p'>)</span> <span class='p'>{</span>
+      <span class='nx'>parsed</span> <span class='o'>=</span> <span class='nx'>rule</span><span class='p'>[</span><span class='mi'>1</span><span class='p'>](</span><span class='nx'>expr</span><span class='p'>);</span>
+    <span class='p'>}</span>
+  <span class='p'>});</span>
+  <span class='k'>return</span> <span class='nx'>parsed</span><span class='p'>;</span>
+<span class='p'>};</span>
+</code></pre></div>
+<h2 id='evaluating'>Evaluating</h2>
+
+<p>With an appropriate data structure to represent our expressions in place, we can begin to evaluate expressions. Basically, we just need a way of constructing lambdas, and then a way of referencing and invoking them. The following encompasses that:</p>
+<div class='highlight'><pre><code class='javascript'><span class='kd'>var</span> <span class='nb'>eval</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>,</span> <span class='nx'>env</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='k'>if</span><span class='p'>(</span> <span class='k'>typeof</span> <span class='nx'>x</span> <span class='o'>==</span> <span class='s1'>&#39;string&#39;</span> <span class='p'>)</span> <span class='p'>{</span>
+    <span class='c1'>// variable references</span>
+    <span class='k'>return</span> <span class='nx'>env</span><span class='p'>[</span><span class='nx'>x</span><span class='p'>];</span>
+  <span class='p'>}</span> <span class='k'>else</span> <span class='k'>if</span><span class='p'>(</span> <span class='nx'>x</span><span class='p'>[</span><span class='mi'>0</span><span class='p'>]</span> <span class='o'>==</span> <span class='s1'>&#39;=&#39;</span> <span class='p'>)</span> <span class='p'>{</span>
+    <span class='c1'>// variable assignment</span>
+    <span class='nx'>env</span><span class='p'>[</span><span class='nx'>x</span><span class='p'>[</span><span class='mi'>1</span><span class='p'>]]</span> <span class='o'>=</span> <span class='nb'>eval</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>[</span><span class='mi'>2</span><span class='p'>],</span> <span class='nx'>env</span><span class='p'>);</span>
+    <span class='k'>return</span> <span class='nx'>env</span><span class='p'>;</span>
+  <span class='p'>}</span> <span class='k'>else</span> <span class='k'>if</span><span class='p'>(</span> <span class='nx'>x</span><span class='p'>[</span><span class='mi'>0</span><span class='p'>]</span> <span class='o'>==</span> <span class='s1'>&#39;lambda&#39;</span> <span class='p'>)</span> <span class='p'>{</span>
+    <span class='c1'>// lambda definition</span>
+    <span class='k'>return</span> <span class='kd'>function</span><span class='p'>()</span> <span class='p'>{</span> <span class='k'>return</span> <span class='nb'>eval</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>[</span><span class='mi'>2</span><span class='p'>],</span> <span class='nx'>Env</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>[</span><span class='mi'>1</span><span class='p'>],</span> <span class='nx'>arguments</span><span class='p'>,</span> <span class='nx'>env</span><span class='p'>))</span> <span class='p'>};</span>
+  <span class='p'>}</span> <span class='k'>else</span> <span class='p'>{</span>
+    <span class='c1'>// function invocation</span>
+    <span class='kd'>var</span> <span class='nx'>exps</span> <span class='o'>=</span> <span class='nx'>x</span><span class='p'>.</span><span class='nx'>map</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>expr</span><span class='p'>)</span> <span class='p'>{</span> <span class='k'>return</span> <span class='nb'>eval</span><span class='p'>(</span><span class='nx'>expr</span><span class='p'>,</span> <span class='nx'>env</span><span class='p'>);</span> <span class='p'>});</span>
+    <span class='k'>return</span> <span class='nx'>exps</span><span class='p'>.</span><span class='nx'>shift</span><span class='p'>().</span><span class='nx'>apply</span><span class='p'>({},</span> <span class='nx'>exps</span><span class='p'>);</span>
+  <span class='p'>}</span>	
+<span class='p'>};</span>
+</code></pre></div>
+<p>As an example, the evaluation of a single parsed expression follows. It may be helpful to know that the following expression is often abbreviated to <code>SUCC ZERO</code>.</p>
+<div class='highlight'><pre><code class='javascript'><span class='nb'>eval</span><span class='p'>(</span><span class='nx'>parse</span><span class='p'>(</span><span class='s2'>&quot;(λn-&gt;λf-&gt;λx-&gt;f(n f x))(λf-&gt;λn-&gt;n)&quot;</span><span class='p'>));</span>
+<span class='c1'>// =&gt; λf-&gt;λx-&gt;f x</span>
+</code></pre></div>
+<p>As you would expect, the response is a function. However, there is a much friendlier way of interpreting it, as an integer. To enable us to render the response we will slightly modify our evaluation function.</p>
+<div class='highlight'><pre><code class='javascript'><span class='kd'>var</span> <span class='nb'>eval</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>,</span> <span class='nx'>env</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='k'>if</span><span class='p'>(</span> <span class='k'>typeof</span> <span class='nx'>x</span> <span class='o'>==</span> <span class='s1'>&#39;function&#39;</span> <span class='p'>)</span> <span class='p'>{</span>
+    <span class='k'>return</span> <span class='nx'>x</span><span class='p'>;</span>
+  <span class='p'>}</span> <span class='k'>else</span> <span class='k'>if</span><span class='p'>(</span> <span class='k'>typeof</span> <span class='nx'>x</span> <span class='o'>==</span> <span class='s1'>&#39;number&#39;</span> <span class='p'>)</span> <span class='p'>{</span>
+    <span class='k'>return</span> <span class='nx'>x</span><span class='p'>;</span>
+  <span class='p'>}</span>
+  <span class='c1'>// previous rules...	</span>
+<span class='p'>};</span>
+</code></pre></div>
+<p>The <code>function</code> and <code>number</code> cases are handled explicitly, returning the identity. Performing our evaluation with this new function we have:</p>
+<div class='highlight'><pre><code class='javascript'><span class='kd'>var</span> <span class='nx'>ONE</span> <span class='o'>=</span> <span class='nb'>eval</span><span class='p'>(</span><span class='nx'>parse</span><span class='p'>(</span><span class='s2'>&quot;(λn-&gt;λf-&gt;λx-&gt;f(n f x))(λf-&gt;λn-&gt;n)&quot;</span><span class='p'>),</span> <span class='p'>{});</span>
+<span class='nx'>ONE</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>x</span><span class='p'>){</span> <span class='k'>return</span> <span class='nx'>x</span><span class='o'>+</span><span class='mi'>1</span><span class='p'>;</span> <span class='p'>})(</span><span class='mi'>0</span><span class='p'>)</span>
+<span class='c1'>// =&gt; 1</span>
+</code></pre></div>
+<p>That&#8217;s much better! Our last step is implementing an environment system that handles variable declaration and subsequent expression evaluation.</p>
+
+<h2 id='environment'>Environment</h2>
+
+<p>As you may have noticed, in the <code>eval</code> function we referenced a constructor <code>Env</code>. We define it as follows:</p>
+<div class='highlight'><pre><code class='javascript'><span class='kd'>var</span> <span class='nx'>Env</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>name</span><span class='p'>,</span> <span class='nx'>values</span><span class='p'>,</span> <span class='nx'>env</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='c1'>// clone then augment environment making scope without side-effects</span>
+  <span class='kd'>var</span> <span class='nx'>_env</span> <span class='o'>=</span> <span class='p'>{};</span>
+  <span class='k'>for</span><span class='p'>(</span> <span class='kd'>var</span> <span class='nx'>key</span> <span class='k'>in</span> <span class='nx'>env</span> <span class='p'>)</span> <span class='p'>{</span>
+    <span class='nx'>_env</span><span class='p'>[</span><span class='nx'>key</span><span class='p'>]</span> <span class='o'>=</span> <span class='nx'>env</span><span class='p'>[</span><span class='nx'>key</span><span class='p'>];</span>
+  <span class='p'>}</span>
+  <span class='nx'>_env</span><span class='p'>[</span><span class='nx'>name</span><span class='p'>]</span> <span class='o'>=</span> <span class='nb'>eval</span><span class='p'>(</span><span class='nx'>values</span><span class='p'>[</span><span class='mi'>0</span><span class='p'>],</span> <span class='nx'>_env</span><span class='p'>);</span>
+  <span class='k'>return</span> <span class='nx'>_env</span><span class='p'>;</span>
+<span class='p'>};</span>
+</code></pre></div>
+<p>The purpose of this function is to construct environments for lambdas based on the parent environment, or &#8220;closure&#8221;. Now the issue becomes passing an environment on to expressions to be evaluated subsequently. Let&#8217;s begin by breaking a program up into expressions.</p>
+<div class='highlight'><pre><code class='javascript'><span class='kd'>var</span> <span class='nx'>interpret</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>program</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='kd'>var</span> <span class='nx'>exprs</span> <span class='o'>=</span> <span class='nx'>program</span><span class='p'>.</span><span class='nx'>split</span><span class='p'>(</span><span class='s1'>&#39;\n&#39;</span><span class='p'>);</span>
+  <span class='k'>return</span> <span class='nx'>recursive_interpret</span><span class='p'>(</span><span class='nx'>exprs</span><span class='p'>);</span>
+<span class='p'>};</span>
+</code></pre></div>
+<p>As you can see, we now need to implement <code>recursive_interpret</code>. The purpose of this function is to modify the environment under each expression and then pass the new environment onto following expressions. We implement it as follows.</p>
+<div class='highlight'><pre><code class='javascript'><span class='kd'>var</span> <span class='nx'>recursive_interpret</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>exprs</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='kd'>var</span> <span class='nx'>parsed</span> <span class='o'>=</span> <span class='nx'>parse</span><span class='p'>(</span><span class='nx'>exprs</span><span class='p'>.</span><span class='nx'>pop</span><span class='p'>());</span>
+  <span class='k'>return</span> <span class='nx'>exprs</span><span class='p'>.</span><span class='nx'>length</span> <span class='o'>==</span> <span class='mi'>0</span> <span class='o'>?</span> <span class='nb'>eval</span><span class='p'>(</span><span class='nx'>parsed</span><span class='p'>,</span> <span class='p'>{})</span> <span class='o'>:</span> <span class='nb'>eval</span><span class='p'>(</span><span class='nx'>parsed</span><span class='p'>,</span> <span class='nx'>recursive_interpret</span><span class='p'>(</span><span class='nx'>exprs</span><span class='p'>));</span>
+<span class='p'>};</span>
+</code></pre></div>
+<h2 id='conclusion'>Conclusion</h2>
+
+<p>Putting it all together, we expose a program interpreter as a function of filename and callback.</p>
+<div class='highlight'><pre><code class='javascript'><span class='nx'>module</span><span class='p'>.</span><span class='nx'>exports</span> <span class='o'>=</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>file</span><span class='p'>,</span> <span class='nx'>cb</span><span class='p'>)</span> <span class='p'>{</span>
+  <span class='nx'>fs</span><span class='p'>.</span><span class='nx'>readFile</span><span class='p'>(</span><span class='nx'>__dirname</span> <span class='o'>+</span> <span class='nx'>file</span><span class='p'>,</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>err</span><span class='p'>,</span> <span class='nx'>data</span><span class='p'>)</span> <span class='p'>{</span>
+    <span class='nx'>cb</span><span class='p'>(</span><span class='nx'>interpret</span><span class='p'>(</span><span class='s2'>&quot;&quot;</span><span class='o'>+</span><span class='nx'>data</span><span class='p'>));</span>
+  <span class='p'>});</span>	
+<span class='p'>};</span>
+</code></pre></div>
+<p>Hopefully the implementation of this language&#8217;s interpreter has made clear the process of interpretation, especially its recursive nature. You can see the full project on <a href='https://github.com/mattneary/Lambda-Calculus-Interpreter'>Github</a>.</p>
+</div>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+  	"HTML-CSS": { linebreaks: { automatic: true } },
+  	tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+  });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+</script>
+
+            <div class="footer">
+              <div class="contact">
+                <p>
+                  Matt Neary<br />
+                  Editor in Chief<br />
+                  neary.matt@gmail.com
+                </p>
+              </div>
+              <div class="contact">
+                <p>
+                  <a href="http://github.com/mattneary/">github.com/mattneary</a><br />
+                  <a href="http://twitter.com/matt3141/">twitter.com/matt3141</a><br />
+                </p>
+              </div>
+            </div>
+          </div>
+        </div> <!-- /container -->
+
+    </body>
+</html>
