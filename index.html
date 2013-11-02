@@ -6,6 +6,7 @@ title: Lingua Lambda
 <div id="home">
   <ul class="posts">
   	<div class="column">
+	{% site.posts.length %}
     {% for post in site.posts %}
       {% capture modulo %}{{ forloop.index0 | mod:3 }}{% endcapture %}
       
