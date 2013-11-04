@@ -9,7 +9,7 @@ title: Lingua Lambda
     {% assign nextMulti = 0 %}
     {% for post in site.posts %}
         <li>
-      	  <h3>{{ nextMulti - forloop.index0 }} - {{ post.title }}</h3>
+      	  <h3>{{ nextMulti }}{{ forloop.index0 }} - {{ post.title }}</h3>
       	  <span>&raquo; {{ post.date | date_to_string }}</span>
        	  <p>{{ post.excerpt }}</p>
        	  <a href="{{ post.url }}" class="continue">Continue Reading</a>
