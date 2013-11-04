@@ -8,13 +8,43 @@ title: Lingua Lambda
     <div class="column">
     {% assign counter = '' %}
     {% for post in site.posts %}
-        <li>
-      	  <h3>{{ counter.size }}{{ forloop.index0 }} - {{ post.title }}</h3>
-      	  <span>&raquo; {{ post.date | date_to_string }}</span>
-       	  <p>{{ post.excerpt }}</p>
-       	  <a href="{{ post.url }}" class="continue">Continue Reading</a>
-        </li>
-	{% if counter.size == forloop.index0 %}
+        {% if counter.size == forloop.index0 %}
+	  <li>
+	    <h3>{{ counter.size }}{{ forloop.index0 }} - {{ post.title }}</h3>
+	    <span>&raquo; {{ post.date | date_to_string }}</span>
+	    <p>{{ post.excerpt }}</p>
+	    <a href="{{ post.url }}" class="continue">Continue Reading</a>
+	  </li>
+	  {% capture counter %}{{ counter | append:'...'  }}{% endcapture %}
+	{% endif %}
+    {% endfor %}
+    </div>
+
+    <div class="column">
+    {% assign counter = '.' %}
+    {% for post in site.posts %}
+        {% if counter.size == forloop.index0 %}
+	  <li>
+	    <h3>{{ counter.size }}{{ forloop.index0 }} - {{ post.title }}</h3>
+	    <span>&raquo; {{ post.date | date_to_string }}</span>
+	    <p>{{ post.excerpt }}</p>
+	    <a href="{{ post.url }}" class="continue">Continue Reading</a>
+	  </li>
+	  {% capture counter %}{{ counter | append:'...'  }}{% endcapture %}
+	{% endif %}
+    {% endfor %}
+    </div>
+
+    <div class="column">
+    {% assign counter = '...' %}
+    {% for post in site.posts %}
+        {% if counter.size == forloop.index0 %}
+	  <li>
+	    <h3>{{ counter.size }}{{ forloop.index0 }} - {{ post.title }}</h3>
+	    <span>&raquo; {{ post.date | date_to_string }}</span>
+	    <p>{{ post.excerpt }}</p>
+	    <a href="{{ post.url }}" class="continue">Continue Reading</a>
+	  </li>
 	  {% capture counter %}{{ counter | append:'...'  }}{% endcapture %}
 	{% endif %}
     {% endfor %}
