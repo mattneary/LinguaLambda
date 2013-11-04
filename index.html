@@ -8,8 +8,6 @@ title: Lingua Lambda
   	<div class="column">
 	{{ site.posts.length }}
     {% for post in site.posts %}
-      {% capture modulo %}{{ forloop.index0 | mod:3 }}{% endcapture %}
-      
         {% if modulo == '0' %}
         <li>
       	  <h3>{{ post.title }}</h3>
@@ -22,8 +20,6 @@ title: Lingua Lambda
     </div>
     <div class="column">
     {% for post in site.posts %}
-      {% capture modulo %}{{ forloop.index0 | mod:3 }}{% endcapture %}
-      
         {% if modulo == '1' %}
         <li>
       	  <h3>{{ post.title }}</h3>
@@ -36,8 +32,6 @@ title: Lingua Lambda
     </div>
     <div class="column">
     {% for post in site.posts %}
-      {% capture modulo %}{{ forloop.index0 | mod:3 }}{% endcapture %}
-      
         {% if modulo == '2' %}
         <li>
       	  <h3>{{ post.title }}</h3>
