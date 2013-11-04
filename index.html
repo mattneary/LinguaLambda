@@ -6,7 +6,7 @@ title: Lingua Lambda
 <div id="home">
   <ul class="posts">
     <div class="column">
-    {% assign counter = '.' %}
+    {% assign counter = '' %}
     {% for post in site.posts %}
         <li>
       	  <h3>{{ counter.size }}{{ forloop.index0 }} - {{ post.title }}</h3>
@@ -14,7 +14,9 @@ title: Lingua Lambda
        	  <p>{{ post.excerpt }}</p>
        	  <a href="{{ post.url }}" class="continue">Continue Reading</a>
         </li>
-	{% capture counter %}{{ counter | append:'.'  }}{% endcapture %}
+	{% if counter.size == forloop.index0 %}
+	  {% capture counter %}{{ counter | append:'.'  }}{% endcapture %}
+	{% endif %}
     {% endfor %}
     </div>
   </ul>
