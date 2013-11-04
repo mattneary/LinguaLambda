@@ -14,7 +14,9 @@ title: Lingua Lambda
        	  <p>{{ post.excerpt }}</p>
        	  <a href="{{ post.url }}" class="continue">Continue Reading</a>
         </li>
-	{% assign nextMulti = nextMulti + 3 %}
+	{% if nextMulti == forloop.index0 %}
+	  {% assign nextMulti = nextMulti + 3 %}
+	{% endif %}
     {% endfor %}
     </div>
   </ul>
