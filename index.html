@@ -7,8 +7,9 @@ title: Lingua Lambda
   <ul class="posts">
     <div class="column">
     {% for post in site.posts %}
+        {% capture modulo %}{{ forloop.index0 | mod:3 }}{% endcapture %}
         <li>
-      	  <h3>{{ post.title }}</h3>
+      	  <h3>{{ modulo }} - {{ post.title }}</h3>
       	  <span>&raquo; {{ post.date | date_to_string }}</span>
        	  <p>{{ post.excerpt }}</p>
        	  <a href="{{ post.url }}" class="continue">Continue Reading</a>
