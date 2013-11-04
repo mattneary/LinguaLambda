@@ -15,7 +15,7 @@ title: Lingua Lambda
        	  <a href="{{ post.url }}" class="continue">Continue Reading</a>
         </li>
 	{% if counter.size == forloop.index0 %}
-	  {% capture counter %}{{ counter | append:'.'  }}{% endcapture %}
+	  {% capture counter %}{{ counter | append:'...'  }}{% endcapture %}
 	{% endif %}
     {% endfor %}
     </div>
