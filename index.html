@@ -5,41 +5,14 @@ title: Lingua Lambda
 
 <div id="home">
   <ul class="posts">
-  	<div class="column">
-	{{ site.posts.length }}
-    {% for post in site.posts %}
-        {% if modulo == '0' %}
-        <li>
-      	  <h3>{{ post.title }}</h3>
-      	  <span>&raquo; {{ post.date | date_to_string }}</span>
-       	  <p>{{ post.excerpt }}</p>
-       	  <a href="{{ post.url }}" class="continue">Continue Reading</a>
-        </li>
-        {% endif %}
-    {% endfor %}
-    </div>
     <div class="column">
     {% for post in site.posts %}
-        {% if modulo == '1' %}
         <li>
       	  <h3>{{ post.title }}</h3>
       	  <span>&raquo; {{ post.date | date_to_string }}</span>
        	  <p>{{ post.excerpt }}</p>
        	  <a href="{{ post.url }}" class="continue">Continue Reading</a>
         </li>
-        {% endif %}
-    {% endfor %}
-    </div>
-    <div class="column">
-    {% for post in site.posts %}
-        {% if modulo == '2' %}
-        <li>
-      	  <h3>{{ post.title }}</h3>
-      	  <span>&raquo; {{ post.date | date_to_string }}</span>
-       	  <p>{{ post.excerpt }}</p>
-       	  <a href="{{ post.url }}" class="continue">Continue Reading</a>
-        </li>
-        {% endif %}
     {% endfor %}
     </div>
   </ul>
