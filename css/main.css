@@ -52,6 +52,9 @@ table {
 	margin-top: 12px;
 }
 
+.mobile_column {
+	display: none;
+}
 .column {
 	float: left;
 	width: 300px;
@@ -208,3 +211,4 @@ ul.posts span {
 .post pre.terminal code {
   background-color: #333;
 }
+
